@@ -45,7 +45,7 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 	PAINTSTRUCT ps; // Used in WM_PAINT.
 	HDC hdc;        // Handle to a device context.
 	static ESHAPE s_eCurShapeTool = LINESHAPE;
-	static int s_iCurPenWidth = 10;
+	static int s_iCurPenWidth = 5;
 	static CCanvas* s_pCanvas;
 	static IShape* s_pCurShape = nullptr;
 	static int s_iCurMouseX;
@@ -96,7 +96,7 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 			s_pCurShape = new CLine(PS_SOLID, s_iCurPenWidth, RGB(0, 0, 0), s_iCurMouseX, s_iCurMouseY);
 			break;
 		case RECTANGLESHAPE:
-			s_pCurShape = new CRectangle(EBRUSHSTYLE::SOLID, 0, RGB(255, 255, 255), PS_SOLID, RGB(0, 255, 0), s_iCurMouseX, s_iCurMouseY);
+			s_pCurShape = new CRectangle(EBRUSHSTYLE::HATCH, 0, RGB(0, 255, 0), PS_SOLID, s_iCurPenWidth, RGB(0, 0, 0), s_iCurMouseX, s_iCurMouseY);
 			break;
 		case ELLIPSESHAPE:
 			break;
@@ -130,6 +130,21 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 			s_eCurShapeTool = LINESHAPE;
 			break;
 		}
+		case ID_WIDTH_SMALL:
+		{
+			s_iCurPenWidth = 1;
+			break;
+		}
+		case ID_WIDTH_MEDIUM:
+		{
+			s_iCurPenWidth = 5;
+			break;
+		}
+		case ID_WIDTH_LARGE:
+		{
+			s_iCurPenWidth = 10;
+			break;
+		}
 		case ID_SHAPE_R:
 		{
 			s_eCurShapeTool = RECTANGLESHAPE;
@@ -137,7 +152,7 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 		}
 		case ID_HELP_ABOUT:
 		{
-			MessageBox(_hwnd, L"This paint tool was developed by .............", L"Author Information", MB_OK | MB_ICONINFORMATION);
+			MessageBox(_hwnd, L"This paint tool was developed by Lance Chaney", L"Author Information", MB_OK | MB_ICONINFORMATION);
 			break;
 		}
 		default:
@@ -198,7 +213,7 @@ int WINAPI WinMain(HINSTANCE _hInstance,
 	// create the window
 	hwnd = CreateWindowEx(NULL, // Extended style.
 		WINDOW_CLASS_NAME,      // Class.
-		L"Asma's Paint Tool",   // Title.
+		L"Lance's Paint Tool",   // Title.
 		WS_OVERLAPPEDWINDOW | WS_VISIBLE,
 		100, 100,                    // Initial x,y.
 		1500, 800,                // Initial width, height.

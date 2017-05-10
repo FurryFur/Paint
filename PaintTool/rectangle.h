@@ -17,7 +17,7 @@ enum EBRUSHSTYLE
 class CRectangle : public IShape
 {
 public:
-	CRectangle(EBRUSHSTYLE _eBrushStyle, int _iHatchStyle, COLORREF _FillColor, int _iPenStyle, COLORREF _PenColor, int _iStartX, int _iStartY);
+	CRectangle(EBRUSHSTYLE _eBrushStyle, int _iHatchStyle, COLORREF _FillColor, int _iPenStyle, int _iPenWidth, COLORREF _PenColor, int _iStartX, int _iStartY);
 	CRectangle();
 	virtual ~CRectangle();
 
@@ -32,6 +32,7 @@ public:
 private:
 	EBRUSHSTYLE m_eBrushStyle;
 	int m_iHatchStyle;
+	int m_iPenWidth;
 	COLORREF m_FillColor;
 	int m_iPenStyle;
 	COLORREF m_PenColor;
