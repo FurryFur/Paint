@@ -45,7 +45,7 @@ void CRectangle::Draw(HDC _hdc)
 
 	SelectObject(_hdc, hOldBrush);
 	SelectObject(_hdc, hOldPen);
-	DeleteObject(hOldBrush);
+	DeleteObject(hBrush);
 	DeleteObject(hPen);
 }
 

@@ -93,6 +93,7 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 		case FREEHAND:
 			break;
 		case LINESHAPE:
+			// TODO: Pen width should be set to 1 for all non-solid 
 			s_pCurShape = new CLine(PS_SOLID, s_iCurPenWidth, RGB(0, 0, 0), s_iCurMouseX, s_iCurMouseY);
 			break;
 		case RECTANGLESHAPE:
@@ -107,8 +108,13 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 		default:
 			break;
 		}
+
+		s_pCurShape->SetEndX(s_iCurMouseX);
+		s_pCurShape->SetEndY(s_iCurMouseY);
 		
 		s_pCanvas->AddShape(s_pCurShape);
+
+		InvalidateRect(_hwnd, NULL, TRUE);
 
 		return 0;
 		break;

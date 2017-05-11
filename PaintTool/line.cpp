@@ -18,7 +18,7 @@ CLine::~CLine()
 
 void CLine::Draw(HDC _hdc)
 {
-	HPEN hPen = CreatePen(PS_SOLID, m_iWidth, m_Color);
+	HPEN hPen = CreatePen(m_iStyle, m_iWidth, m_Color);
 	HPEN hOldPen = static_cast<HPEN>(SelectObject(_hdc, hPen));
 
 	MoveToEx(_hdc, m_iStartX, m_iStartY, nullptr);
