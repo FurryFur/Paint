@@ -154,6 +154,7 @@
     <ClInclude Include="stamp.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="backBuffer.cpp" />
     <ClCompile Include="canvas.cpp" />
     <ClCompile Include="ellipse.cpp" />
     <ClCompile Include="line.cpp" />

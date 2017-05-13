@@ -14,13 +14,14 @@ public:
 
 	int GetHeight() const;
 	int GetWidth() const;
+	HBITMAP GetHBitmap() const;
 
 	void Clear();
 	void Present();
 
 private:
-	CBackBuffer(const CBackBuffer&);
-	CBackBuffer& operator = (const CBackBuffer&);
+	/*CBackBuffer(const CBackBuffer&);*/
+	/*CBackBuffer& operator = (const CBackBuffer&);*/
 
 private:
 	HWND m_hWnd;
@@ -29,8 +30,6 @@ private:
 	HBITMAP m_hOldBitmap; //Used in select object to save the old bitmap.
 	int m_iWidth;
 	int m_iHeight;
-
-
 };
 
 

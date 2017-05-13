@@ -2,6 +2,7 @@
 #define __SHAPE_H__
 
 //	Library Includes
+#include <functional>
 #include <windows.h>
 #include <windowsx.h>
 
@@ -14,6 +15,11 @@ public:
 	void SetEndX(int _iEndX);
 	void SetStartY(int _iStartX);
 	void SetEndY(int _iStartX);
+	int GetStartX() const;
+	int GetStartY() const;
+	int GetEndX() const;
+	int GetEndY() const;
+	void SetUpdateListener(std::function<void(const IShape*)> _fn);
 	//void SetColor(COLORREF _newColor);
 
 protected:
@@ -21,11 +27,14 @@ protected:
 	IShape(int _iStartX, int _iStartY);
 	virtual ~IShape() {}
 
+	void NotifyUpdated();
+
 	int m_iStartX;
 	int m_iEndX;
 	int m_iStartY;
 	int m_iEndY;
 	//COLORREF m_ColorRef;
+	std::function<void(const IShape*)> m_fnUpdateListener;
 };
 
 #endif

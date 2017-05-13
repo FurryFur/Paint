@@ -26,16 +26,20 @@ public:
 	~CCanvas();
 	bool Initialise(HWND _hwnd, int _iWidth, int _iHeight);
 	CBackBuffer* GetBackBuffer();
-	bool Draw(HDC _hdc);
+	bool Draw(HWND _hwnd);
 	// Save Canvas to bitmap
-	void Save(HWND _hwnd);
+	void Save();
 	void AddShape(IShape*);
-	void AddStamp(CStamp*);
+	int GetWidth() const;
+	int GetHeight() const;
 	
 private:
 	CBackBuffer* m_pBackBuffer; // A canvas has a backbuffer.
-	std::vector<CStamp*> m_vecStamps;
 	std::vector<IShape*> m_vecShapes;
+	bool m_bNeedsResize;
+
+	void CheckNeedsResize(const IShape* _pkShape);
+	bool Resize(HWND _hwnd, int _iWidth, int _iHeight);
 };
 
 #endif

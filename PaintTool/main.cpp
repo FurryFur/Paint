@@ -67,7 +67,6 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 	LPARAM _lparam)
 {
 	// This is the main message handler of the system.
-	PAINTSTRUCT ps; // Used in WM_PAINT.
 	HDC hdc;        // Handle to a device context.
 	static ESHAPE s_eCurShapeTool = LINESHAPE;
 	static int s_iCurPenWidth = 5;
@@ -85,8 +84,9 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 	{
 		// Do initialization stuff here.
 		s_pCanvas = new CCanvas();
-
-
+		RECT rect;
+		GetClientRect(_hwnd, &rect);
+		s_pCanvas->Initialise(_hwnd, rect.right - rect.left, rect.bottom - rect.top);
 
 		// Return Success.
 		return (0);
@@ -94,12 +94,7 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 	}
 	case WM_PAINT:
 	{
-		hdc = BeginPaint(_hwnd, &ps);
-		// You would do all your painting here...
-
-		s_pCanvas->Draw(hdc);
-
-		EndPaint(_hwnd, &ps);
+		s_pCanvas->Draw(_hwnd);
 
 		// Return Success.
 		return (0);
@@ -123,7 +118,8 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 				s_pCurShape->SetEndY(s_iCurMouseY);
 			}
 
-			InvalidateRect(_hwnd, NULL, TRUE);
+			// Trigger redraw
+			InvalidateRect(_hwnd, NULL, FALSE);
 		}
 
 		return 0;
@@ -137,6 +133,7 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 			CheckPenWidthMenuItem(hMenu, ID_WIDTH_SMALL);
 		}
 
+		// Create new shape
 		switch (s_eCurShapeTool)
 		{
 		case FREEHAND:
@@ -159,13 +156,14 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 		default:
 			break;
 		}
-
 		s_pCurShape->SetEndX(s_iCurMouseX);
 		s_pCurShape->SetEndY(s_iCurMouseY);
 
+		// Add new shape to canvas
 		s_pCanvas->AddShape(s_pCurShape);
 
-		InvalidateRect(_hwnd, NULL, TRUE);
+		// Trigger redraw
+		InvalidateRect(_hwnd, NULL, FALSE);
 
 		return 0;
 		break;
@@ -183,69 +181,7 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 		{
 		case ID_FILE_SAVE:
 		{
-			HDC hdc = GetDC(_hwnd);
-
-			// Create device context to load bitmap into
-			HDC hdcCapture = CreateCompatibleDC(hdc);
-
-			// Create capture bitmap
-			RECT rect;
-			GetClientRect(_hwnd, &rect);
-			int iWidth = rect.right - rect.left;
-			int iHeight = rect.bottom - rect.top;
-			// TODO: Backbuffer and saving out off screen shapes
-			HBITMAP hCaptureBitmap = CreateCompatibleBitmap(hdc, iWidth, iHeight);
-
-			// Select bitmap into device context
-			HBITMAP hOldBitmap = static_cast<HBITMAP>(SelectObject(hdcCapture, hCaptureBitmap));
-
-			// Bit blip from window to capture bitmap 
-			BitBlt(hdcCapture, 0, 0, iWidth, iHeight, hdc, 0, 0, SRCCOPY);
-
-			// Save the bitmap
-			BITMAP bitmapCapture;
-			GetObject(hCaptureBitmap, sizeof(BITMAP), &bitmapCapture);
-
-			// Create bitmap header
-			BITMAPINFO bmi;
-			BITMAPINFOHEADER& bmih = bmi.bmiHeader;
-
-			bmih.biSize = sizeof(BITMAPINFOHEADER);
-			bmih.biWidth = bitmapCapture.bmWidth;
-			bmih.biHeight = bitmapCapture.bmHeight;
-			bmih.biPlanes = bitmapCapture.bmPlanes;
-			bmih.biBitCount = bitmapCapture.bmBitsPixel;
-			// Our bitmap is uncrompressed
-			bmih.biCompression = BI_RGB;
-			bmih.biSizeImage = bitmapCapture.bmWidth * bitmapCapture.bmHeight * 4;
-
-			// Save to file
-			BITMAPFILEHEADER bmfh;
-			LONG lImageSize = bmih.biSizeImage;
-			LPVOID lpBits = malloc(lImageSize);
-
-			// Get Bits
-			GetDIBits(hdc, hCaptureBitmap, 0, bmih.biHeight, lpBits, &bmi, DIB_RGB_COLORS);
-
-			// Save to file
-			FILE* pFile = fopen("test.bmp", "wb");
-			int iBitsOffset = sizeof(BITMAPFILEHEADER) + bmih.biSize;
-			LONG lFileSize = iBitsOffset + lImageSize;
-			bmfh.bfType = 'B' + ('M' << 8);
-			bmfh.bfOffBits = iBitsOffset;
-			bmfh.bfSize = lFileSize;
-
-			fwrite(&bmfh, 1, sizeof(BITMAPFILEHEADER), pFile);
-			fwrite(&bmih, 1, sizeof(BITMAPINFOHEADER), pFile);
-			fwrite(lpBits, 1, lImageSize, pFile);
-
-			// Cleanup
-			fclose(pFile);
-			free(lpBits);
-			static_cast<HBITMAP>(SelectObject(hdcCapture, hOldBitmap));
-			DeleteDC(hdcCapture);
-			DeleteObject(hCaptureBitmap);
-			ReleaseDC(_hwnd, hdc);
+			s_pCanvas->Save();
 
 			break;
 		}

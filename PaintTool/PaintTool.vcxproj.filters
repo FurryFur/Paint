@@ -68,6 +68,9 @@
     <ClCompile Include="stamp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="backBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PaintTool.rc">
