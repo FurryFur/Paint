@@ -5,14 +5,7 @@
 #include <windows.h>
 #include <windowsx.h>
 #include "shape.h"
-
-
-enum EBRUSHSTYLE
-{
-	NOSTYLE = -1,
-	SOLID,
-	HATCH
-};
+#include "Enum.h"
 
 class CRectangle : public IShape
 {

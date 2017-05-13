@@ -145,6 +145,7 @@
     <ClInclude Include="backBuffer.h" />
     <ClInclude Include="canvas.h" />
     <ClInclude Include="ellipse.h" />
+    <ClInclude Include="Enum.h" />
     <ClInclude Include="line.h" />
     <ClInclude Include="polygon.h" />
     <ClInclude Include="rectangle.h" />
@@ -154,13 +155,18 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="canvas.cpp" />
+    <ClCompile Include="ellipse.cpp" />
     <ClCompile Include="line.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="rectangle.cpp" />
     <ClCompile Include="shape.cpp" />
+    <ClCompile Include="stamp.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PaintTool.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="stamp.bmp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

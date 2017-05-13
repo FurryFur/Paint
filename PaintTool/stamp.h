@@ -12,8 +12,6 @@ public:
 	virtual ~CStamp();
 
 	virtual void Draw(HDC _hdc);
-	void SetStartX(int _iX);
-	void SetStartY(int _iY);
 
 private:
 	HBITMAP m_hBitMap;

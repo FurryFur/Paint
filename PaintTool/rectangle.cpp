@@ -21,8 +21,7 @@ CRectangle::~CRectangle()
 
 void CRectangle::Draw(HDC _hdc)
 {
-	// TODO: How to get pen width?
-	HPEN hPen = CreatePen(PS_SOLID, m_iPenWidth, m_PenColor);
+	HPEN hPen = CreatePen(m_iPenStyle, m_iPenWidth, m_PenColor);
 	HPEN hOldPen = static_cast<HPEN>(SelectObject(_hdc, hPen));
 
 	HBRUSH hBrush;
@@ -32,6 +31,8 @@ void CRectangle::Draw(HDC _hdc)
 		hBrush = CreateHatchBrush(HS_DIAGCROSS, m_FillColor);
 		break;
 	case NOSTYLE:
+		hBrush = static_cast<HBRUSH>(GetStockObject(NULL_BRUSH));
+		break;
 	case SOLID:
 	default:
 		hBrush = CreateSolidBrush(m_FillColor);
