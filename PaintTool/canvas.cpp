@@ -84,6 +84,9 @@ bool CCanvas::Resize(HWND _hwnd, int _iWidth, int _iHeight)
 {
 	m_bNeedsResize = false;
 
+	// Recreate backbuffer
+	delete m_pBackBuffer;
+	m_pBackBuffer = new CBackBuffer();
 	return m_pBackBuffer->Initialise(_hwnd, _iWidth, _iHeight);
 }
 
