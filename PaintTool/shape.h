@@ -6,6 +6,8 @@
 #include <windows.h>
 #include <windowsx.h>
 
+class IUpdateListener;
+
 class IShape
 {
 public:
@@ -19,7 +21,7 @@ public:
 	int GetStartY() const;
 	int GetEndX() const;
 	int GetEndY() const;
-	void SetUpdateListener(std::function<void(const IShape*)> _fn);
+	void IShape::SetUpdateListener(IUpdateListener* _pUpdateListener);
 	//void SetColor(COLORREF _newColor);
 
 protected:
@@ -36,7 +38,7 @@ protected:
 	int m_iStartY;
 	int m_iEndY;
 	//COLORREF m_ColorRef;
-	std::function<void(const IShape*)> m_fnUpdateListener;
+	IUpdateListener* m_pUpdateListener;
 };
 
 #endif

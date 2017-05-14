@@ -7,6 +7,8 @@
 #include <windowsx.h>
 #include <vector>
 
+#include "IUpdateListener.h"
+
 typedef enum
 {
 	LINE = 0,
@@ -20,11 +22,11 @@ class CLine;
 class CStamp;
 class CBackBuffer;
 
-class CCanvas
+class CCanvas : public IUpdateListener
 {
 public:
 	CCanvas();
-	~CCanvas();
+	virtual ~CCanvas() override;
 	bool Initialise(HWND _hwnd, int _iWidth, int _iHeight);
 	CBackBuffer* GetBackBuffer();
 	bool Draw(HWND _hwnd);
@@ -33,13 +35,15 @@ public:
 	void AddShape(IShape*);
 	int GetWidth() const;
 	int GetHeight() const;
+
+	// Notify the canvas that the specified shape has been updated (moved)
+	virtual void NotifyUpdated(const IShape* _pkShape) override;
 	
 private:
 	CBackBuffer* m_pBackBuffer; // A canvas has a backbuffer.
 	std::vector<IShape*> m_vecShapes;
 	bool m_bNeedsResize;
 	const IShape* m_pkShapeThatTriggeredResize;
-	void CheckNeedsResize(const IShape* _pkShape);
 	bool Resize(HWND _hwnd, int _iWidth, int _iHeight);
 };
 

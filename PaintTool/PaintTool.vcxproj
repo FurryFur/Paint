@@ -146,6 +146,7 @@
     <ClInclude Include="canvas.h" />
     <ClInclude Include="ellipse.h" />
     <ClInclude Include="Enum.h" />
+    <ClInclude Include="IUpdateListener.h" />
     <ClInclude Include="line.h" />
     <ClInclude Include="polygon.h" />
     <ClInclude Include="rectangle.h" />
@@ -157,6 +158,7 @@
     <ClCompile Include="backBuffer.cpp" />
     <ClCompile Include="canvas.cpp" />
     <ClCompile Include="ellipse.cpp" />
+    <ClCompile Include="IUpdateListener.cpp" />
     <ClCompile Include="line.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="rectangle.cpp" />

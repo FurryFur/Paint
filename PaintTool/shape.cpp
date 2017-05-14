@@ -1,16 +1,18 @@
 #include "shape.h"
+#include "IUpdateListener.h"
 
 IShape::IShape(int _iStartX, int _iStartY) :
 	m_iStartX(_iStartX),
-	m_iStartY(_iStartY)
+	m_iStartY(_iStartY),
+	m_pUpdateListener(nullptr)
 {
 }
 
 void IShape::NotifyUpdated()
 {
-	if (m_fnUpdateListener)
+	if (m_pUpdateListener)
 	{
-		m_fnUpdateListener(this);
+		m_pUpdateListener->NotifyUpdated(this);
 	}
 }
 
@@ -58,9 +60,9 @@ int IShape::GetEndY() const
 	return m_iEndY;
 }
 
-void IShape::SetUpdateListener(std::function<void(const IShape*)> _fn)
+void IShape::SetUpdateListener(IUpdateListener* _pUpdateListener)
 {
-	m_fnUpdateListener = _fn;
+	m_pUpdateListener = _pUpdateListener;
 
-	NotifyUpdated();
+	_pUpdateListener->NotifyUpdated(this);
 }

@@ -32,7 +32,16 @@ bool CCanvas::Draw(HWND _hwnd)
 	{
 		RECT rect;
 		GetClientRect(_hwnd, &rect);
-		Resize(_hwnd, rect.right - rect.left, rect.bottom - rect.top);
+
+		// Make sure the resize encloses the triggering shape
+		int iStartX = m_pkShapeThatTriggeredResize->GetStartX();
+		int iStartY = m_pkShapeThatTriggeredResize->GetStartY();
+		int iEndX = m_pkShapeThatTriggeredResize->GetEndX();
+		int iEndY = m_pkShapeThatTriggeredResize->GetEndY();
+		int iWidth = std::max(std::max(iStartX, iEndX), static_cast<int>(rect.right - rect.left));
+		int iHeight = std::max(std::max(iStartY, iEndY), static_cast<int>(rect.bottom - rect.top));
+
+		Resize(_hwnd, iWidth, iHeight);
 	}
 
 	// Clear the back buffer
@@ -54,8 +63,7 @@ void CCanvas::AddShape(IShape * _pShape)
 {
 	m_vecShapes.push_back(_pShape);
 
-	using std::placeholders::_1;
-	_pShape->SetUpdateListener(std::bind(&CCanvas::CheckNeedsResize, this, _1));
+	_pShape->SetUpdateListener(this);
 }
 
 int CCanvas::GetWidth() const
@@ -68,8 +76,9 @@ int CCanvas::GetHeight() const
 	return m_pBackBuffer->GetHeight();
 }
 
-void CCanvas::CheckNeedsResize(const IShape* _pkShape)
+void CCanvas::NotifyUpdated(const IShape* _pkShape)
 {
+	// Check if we need to resize the canvas to enclose the updated shape
 	int iWidth = GetWidth();
 	int iHeight = GetHeight();
 	int iStartX = _pkShape->GetStartX();
@@ -86,15 +95,6 @@ void CCanvas::CheckNeedsResize(const IShape* _pkShape)
 bool CCanvas::Resize(HWND _hwnd, int _iWidth, int _iHeight)
 {
 	m_bNeedsResize = false;
-
-	// Make sure the resize encloses the triggering shape
-	m_pkShapeThatTriggeredResize;
-	int iStartX = m_pkShapeThatTriggeredResize->GetStartX();
-	int iStartY = m_pkShapeThatTriggeredResize->GetStartY();
-	int iEndX = m_pkShapeThatTriggeredResize->GetEndX();
-	int iEndY = m_pkShapeThatTriggeredResize->GetEndY();
-	_iWidth = std::max(std::max(iStartX, iEndX), _iWidth);
-	_iHeight = std::max(std::max(iStartY, iEndY), _iHeight);
 
 	// Recreate backbuffer
 	delete m_pBackBuffer;
