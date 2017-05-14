@@ -127,7 +127,7 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 	HDC hdc;        // Handle to a device context.
 	static ESHAPE s_eCurShapeTool = LINESHAPE;
 	static int s_iCurPenWidth = 5;
-	static int s_iSavedPenWidth = s_iCurPenWidth;
+	static int s_iSavedPenWidth = -1;
 	static EBRUSHSTYLE s_eCurBrushStyle = HATCH;
 	static int s_iCurPenStyle = PS_SOLID;
 	static CCanvas* s_pCanvas;
@@ -188,20 +188,6 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 	}
 	case WM_LBUTTONDOWN:
 	{
-		// TODO: Needs to be moved to menu item clicked event, otherwise doesn't reenable width menu until something is drawn.
-		if (s_iCurPenStyle != PS_SOLID)
-		{
-			s_iSavedPenWidth = s_iCurPenWidth;
-			s_iCurPenWidth = 1;
-			CheckPenWidthMenuItem(hMenu, ID_WIDTH_SMALL);
-			DisablePenWidthMenu(hMenu);
-		}
-		else
-		{
-			s_iCurPenWidth = s_iSavedPenWidth;
-			EnablePenWidthMenu(hMenu);
-		}
-
 		// Create new shape
 		switch (s_eCurShapeTool)
 		{
@@ -353,30 +339,65 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 		}
 		case ID_STYLE_SOLID:
 		{
+			if (s_iSavedPenWidth > 0)
+			{
+				EnablePenWidthMenu(hMenu);
+				s_iCurPenWidth = s_iSavedPenWidth;
+				s_iSavedPenWidth = -1;
+			}
+
 			CheckPenStyleMenuItem(hMenu, ID_STYLE_SOLID);
 			s_iCurPenStyle = PS_SOLID;
 			break;
 		}
 		case ID_STYLE_DOT:
 		{
+			if (s_iSavedPenWidth < 0)
+			{
+				s_iSavedPenWidth = s_iCurPenWidth;
+			}
+			s_iCurPenWidth = 1;
+			DisablePenWidthMenu(hMenu);
+
 			CheckPenStyleMenuItem(hMenu, ID_STYLE_DOT);
 			s_iCurPenStyle = PS_DOT;
 			break;
 		}
 		case ID_STYLE_DASH:
 		{
+			if (s_iSavedPenWidth < 0)
+			{
+				s_iSavedPenWidth = s_iCurPenWidth;
+			}
+			s_iCurPenWidth = 1;
+			DisablePenWidthMenu(hMenu);
+
 			CheckPenStyleMenuItem(hMenu, ID_STYLE_DASH);
 			s_iCurPenStyle = PS_DASH;
 			break;
 		}
 		case ID_STYLE_DASHDOT:
 		{
+			if (s_iSavedPenWidth < 0)
+			{
+				s_iSavedPenWidth = s_iCurPenWidth;
+			}
+			s_iCurPenWidth = 1;
+			DisablePenWidthMenu(hMenu);
+
 			CheckPenStyleMenuItem(hMenu, ID_STYLE_DASHDOT);
 			s_iCurPenStyle = PS_DASHDOT;
 			break;
 		}
 		case ID_STYLE_DASHDOTDOT:
 		{
+			if (s_iSavedPenWidth < 0)
+			{
+				s_iSavedPenWidth = s_iCurPenWidth;
+			}
+			s_iCurPenWidth = 1;
+			DisablePenWidthMenu(hMenu);
+
 			CheckPenStyleMenuItem(hMenu, ID_STYLE_DASHDOTDOT);
 			s_iCurPenStyle = PS_DASHDOTDOT;
 			break;
