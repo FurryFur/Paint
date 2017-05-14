@@ -61,6 +61,30 @@ void CheckPenWidthMenuItem(HMENU _hMenu, UINT _uIDCheckItem)
 	CheckMenuItem(_hMenu, _uIDCheckItem, MF_CHECKED);
 }
 
+void CheckPenStyleMenuItem(HMENU _hMenu, UINT _uIDCheckItem)
+{
+	// Uncheck other menu items
+	CheckMenuItem(_hMenu, ID_STYLE_SOLID, MF_UNCHECKED);
+	CheckMenuItem(_hMenu, ID_STYLE_DOT, MF_UNCHECKED);
+	CheckMenuItem(_hMenu, ID_STYLE_DASH, MF_UNCHECKED);
+	CheckMenuItem(_hMenu, ID_STYLE_DASHDOT, MF_UNCHECKED);
+	CheckMenuItem(_hMenu, ID_STYLE_DASHDOTDOT, MF_UNCHECKED);
+
+	// Check selected menu item
+	CheckMenuItem(_hMenu, _uIDCheckItem, MF_CHECKED);
+}
+
+void CheckBrushStyleMenuItem(HMENU _hMenu, UINT _uIDCheckItem)
+{
+	// Uncheck other menu items
+	CheckMenuItem(_hMenu, ID_STYLE_TRANSPARENT, MF_UNCHECKED);
+	CheckMenuItem(_hMenu, ID_STYLE_FILL, MF_UNCHECKED);
+	CheckMenuItem(_hMenu, ID_STYLE_HATCH, MF_UNCHECKED);
+
+	// Check selected menu item
+	CheckMenuItem(_hMenu, _uIDCheckItem, MF_CHECKED);
+}
+
 void DisablePenWidthMenu(HMENU _hMenu)
 {
 	EnableMenuItem(_hMenu, ID_WIDTH_SMALL, MF_GRAYED);
@@ -103,6 +127,7 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 	HDC hdc;        // Handle to a device context.
 	static ESHAPE s_eCurShapeTool = LINESHAPE;
 	static int s_iCurPenWidth = 5;
+	static int s_iSavedPenWidth = s_iCurPenWidth;
 	static EBRUSHSTYLE s_eCurBrushStyle = HATCH;
 	static int s_iCurPenStyle = PS_SOLID;
 	static CCanvas* s_pCanvas;
@@ -163,14 +188,17 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 	}
 	case WM_LBUTTONDOWN:
 	{
+		// TODO: Needs to be moved to menu item clicked event, otherwise doesn't reenable width menu until something is drawn.
 		if (s_iCurPenStyle != PS_SOLID)
 		{
+			s_iSavedPenWidth = s_iCurPenWidth;
 			s_iCurPenWidth = 1;
 			CheckPenWidthMenuItem(hMenu, ID_WIDTH_SMALL);
 			DisablePenWidthMenu(hMenu);
 		}
 		else
 		{
+			s_iCurPenWidth = s_iSavedPenWidth;
 			EnablePenWidthMenu(hMenu);
 		}
 
@@ -305,28 +333,51 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 			ColorChooser(_hwnd, s_colCurBrush);
 			break;
 		}
+		case ID_STYLE_TRANSPARENT:
+		{
+			CheckBrushStyleMenuItem(hMenu, ID_STYLE_TRANSPARENT);
+			s_eCurBrushStyle = NOSTYLE;
+			break;
+		}
+		case ID_STYLE_FILL:
+		{
+			CheckBrushStyleMenuItem(hMenu, ID_STYLE_FILL);
+			s_eCurBrushStyle = SOLID;
+			break;
+		}
+		case ID_STYLE_HATCH:
+		{
+			CheckBrushStyleMenuItem(hMenu, ID_STYLE_HATCH);
+			s_eCurBrushStyle = HATCH;
+			break;
+		}
 		case ID_STYLE_SOLID:
 		{
+			CheckPenStyleMenuItem(hMenu, ID_STYLE_SOLID);
 			s_iCurPenStyle = PS_SOLID;
 			break;
 		}
 		case ID_STYLE_DOT:
 		{
+			CheckPenStyleMenuItem(hMenu, ID_STYLE_DOT);
 			s_iCurPenStyle = PS_DOT;
 			break;
 		}
 		case ID_STYLE_DASH:
 		{
+			CheckPenStyleMenuItem(hMenu, ID_STYLE_DASH);
 			s_iCurPenStyle = PS_DASH;
 			break;
 		}
 		case ID_STYLE_DASHDOT:
 		{
+			CheckPenStyleMenuItem(hMenu, ID_STYLE_DASHDOT);
 			s_iCurPenStyle = PS_DASHDOT;
 			break;
 		}
 		case ID_STYLE_DASHDOTDOT:
 		{
+			CheckPenStyleMenuItem(hMenu, ID_STYLE_DASHDOTDOT);
 			s_iCurPenStyle = PS_DASHDOTDOT;
 			break;
 		}
