@@ -2,6 +2,7 @@
 #define __CANVAS_H__
 
 //	Library Includes
+#define NOMINMAX
 #include <windows.h>
 #include <windowsx.h>
 #include <vector>
@@ -37,7 +38,7 @@ private:
 	CBackBuffer* m_pBackBuffer; // A canvas has a backbuffer.
 	std::vector<IShape*> m_vecShapes;
 	bool m_bNeedsResize;
-
+	const IShape* m_pkShapeThatTriggeredResize;
 	void CheckNeedsResize(const IShape* _pkShape);
 	bool Resize(HWND _hwnd, int _iWidth, int _iHeight);
 };

@@ -11,9 +11,9 @@ class IShape
 public:
 	virtual void Draw(HDC _hdc) = 0;
 
-	void SetStartX(int _iStartX);
+	virtual void SetStartX(int _iStartX);
 	void SetEndX(int _iEndX);
-	void SetStartY(int _iStartX);
+	virtual void SetStartY(int _iStartX);
 	void SetEndY(int _iStartX);
 	int GetStartX() const;
 	int GetStartY() const;
@@ -29,6 +29,8 @@ protected:
 
 	void NotifyUpdated();
 
+	int m_iWidth;
+	int m_iHeight;
 	int m_iStartX;
 	int m_iEndX;
 	int m_iStartY;

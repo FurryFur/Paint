@@ -1,5 +1,7 @@
-#include "backBuffer.h"
+#include <algorithm>
+
 #include "canvas.h"
+#include "backBuffer.h"
 #include "shape.h"
 #include "stamp.h"
 
@@ -77,12 +79,22 @@ void CCanvas::CheckNeedsResize(const IShape* _pkShape)
 	if (iWidth < iStartX || iWidth < iEndX || iHeight < iStartY || iHeight < iEndY)
 	{
 		m_bNeedsResize = true;
+		m_pkShapeThatTriggeredResize = _pkShape;
 	}
 }
 
 bool CCanvas::Resize(HWND _hwnd, int _iWidth, int _iHeight)
 {
 	m_bNeedsResize = false;
+
+	// Make sure the resize encloses the triggering shape
+	m_pkShapeThatTriggeredResize;
+	int iStartX = m_pkShapeThatTriggeredResize->GetStartX();
+	int iStartY = m_pkShapeThatTriggeredResize->GetStartY();
+	int iEndX = m_pkShapeThatTriggeredResize->GetEndX();
+	int iEndY = m_pkShapeThatTriggeredResize->GetEndY();
+	_iWidth = std::max(std::max(iStartX, iEndX), _iWidth);
+	_iHeight = std::max(std::max(iStartY, iEndY), _iHeight);
 
 	// Recreate backbuffer
 	delete m_pBackBuffer;
