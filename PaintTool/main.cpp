@@ -61,6 +61,39 @@ void CheckPenWidthMenuItem(HMENU _hMenu, UINT _uIDCheckItem)
 	CheckMenuItem(_hMenu, _uIDCheckItem, MF_CHECKED);
 }
 
+void DisablePenWidthMenu(HMENU _hMenu)
+{
+	EnableMenuItem(_hMenu, ID_WIDTH_SMALL, MF_GRAYED);
+	EnableMenuItem(_hMenu, ID_WIDTH_MEDIUM, MF_GRAYED);
+	EnableMenuItem(_hMenu, ID_WIDTH_LARGE, MF_GRAYED);
+}
+
+void EnablePenWidthMenu(HMENU _hMenu)
+{
+	EnableMenuItem(_hMenu, ID_WIDTH_SMALL, MF_ENABLED);
+	EnableMenuItem(_hMenu, ID_WIDTH_MEDIUM, MF_ENABLED);
+	EnableMenuItem(_hMenu, ID_WIDTH_LARGE, MF_ENABLED);
+}
+
+void ColorChooser(HWND _hwnd, COLORREF& _colCur)
+{
+	CHOOSECOLOR cc;                 // common dialog box structure 
+	static COLORREF acrCustClr[16]; // array of custom colors 
+
+									// Initialize CHOOSECOLOR 
+	ZeroMemory(&cc, sizeof(cc));
+	cc.lStructSize = sizeof(cc);
+	cc.hwndOwner = _hwnd;
+	cc.lpCustColors = (LPDWORD)acrCustClr;
+	cc.rgbResult = _colCur;
+	cc.Flags = CC_FULLOPEN | CC_RGBINIT;
+
+	if (ChooseColor(&cc) == TRUE)
+	{
+		_colCur = cc.rgbResult;
+	}
+}
+
 LRESULT CALLBACK WindowProc(HWND _hwnd,
 	UINT _msg,
 	WPARAM _wparam,
@@ -76,6 +109,9 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 	static IShape* s_pCurShape = nullptr;
 	static int s_iCurMouseX;
 	static int s_iCurMouseY;
+	static COLORREF s_colCurPen = RGB(40, 128, 255);
+	static COLORREF s_colCurBrush = RGB(0, 255, 0);
+
 	HMENU hMenu = GetMenu(_hwnd);
 	
 	switch (_msg)
@@ -131,6 +167,11 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 		{
 			s_iCurPenWidth = 1;
 			CheckPenWidthMenuItem(hMenu, ID_WIDTH_SMALL);
+			DisablePenWidthMenu(hMenu);
+		}
+		else
+		{
+			EnablePenWidthMenu(hMenu);
 		}
 
 		// Create new shape
@@ -140,13 +181,13 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 			break;
 		case LINESHAPE:
 			// TODO: Pen width should be set to 1 for all non-solid 
-			s_pCurShape = new CLine(s_iCurPenStyle, s_iCurPenWidth, RGB(0, 0, 0), s_iCurMouseX, s_iCurMouseY);
+			s_pCurShape = new CLine(s_iCurPenStyle, s_iCurPenWidth, s_colCurPen, s_iCurMouseX, s_iCurMouseY);
 			break;
 		case RECTANGLESHAPE:
-			s_pCurShape = new CRectangle(s_eCurBrushStyle, 0, RGB(0, 255, 0), s_iCurPenStyle, s_iCurPenWidth, RGB(0, 0, 0), s_iCurMouseX, s_iCurMouseY);
+			s_pCurShape = new CRectangle(s_eCurBrushStyle, 0, s_colCurBrush, s_iCurPenStyle, s_iCurPenWidth, s_colCurPen, s_iCurMouseX, s_iCurMouseY);
 			break;
 		case ELLIPSESHAPE:
-			s_pCurShape = new CEllipse(s_eCurBrushStyle, 0, RGB(0, 255, 0), s_iCurPenStyle, s_iCurPenWidth, RGB(0, 0, 0), s_iCurMouseX, s_iCurMouseY);
+			s_pCurShape = new CEllipse(s_eCurBrushStyle, 0, s_colCurBrush, s_iCurPenStyle, s_iCurPenWidth, s_colCurPen, s_iCurMouseX, s_iCurMouseY);
 			break;
 		case POLYGONSHAPE:
 			break;
@@ -252,6 +293,16 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 
 			CheckPenWidthMenuItem(hMenu, ID_WIDTH_LARGE);
 
+			break;
+		}
+		case ID_PEN_COLOR:
+		{
+			ColorChooser(_hwnd, s_colCurPen);
+			break;
+		}
+		case ID_BRUSH_COLOR:
+		{
+			ColorChooser(_hwnd, s_colCurBrush);
 			break;
 		}
 		case ID_STYLE_SOLID:
