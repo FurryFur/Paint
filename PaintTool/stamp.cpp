@@ -14,6 +14,8 @@ CStamp::CStamp(HINSTANCE _hInstance, wchar_t * filename, int _iStartX, int _iSta
 	GetObject(m_hBitMap, sizeof(BITMAP), &bitmap);
 	m_iWidth = bitmap.bmWidth;
 	m_iHeight = bitmap.bmHeight;
+	SetEndX(_iStartX + m_iWidth);
+	SetEndY(_iStartY + m_iHeight);
 }
 
 CStamp::~CStamp()

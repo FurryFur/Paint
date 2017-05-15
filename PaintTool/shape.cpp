@@ -1,6 +1,11 @@
 #include "shape.h"
 #include "IUpdateListener.h"
 
+IShape::IShape() :
+	m_pUpdateListener(nullptr)
+{
+}
+
 IShape::IShape(int _iStartX, int _iStartY) :
 	m_iStartX(_iStartX),
 	m_iStartY(_iStartY),

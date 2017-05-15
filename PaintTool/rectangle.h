@@ -10,7 +10,7 @@
 class CRectangle : public IShape
 {
 public:
-	CRectangle(EBRUSHSTYLE _eBrushStyle, int _iHatchStyle, COLORREF _FillColor, int _iPenStyle, int _iPenWidth, COLORREF _PenColor, int _iStartX, int _iStartY);
+	CRectangle(EBRUSHSTYLE _eBrushStyle, COLORREF _FillColor, int _iPenStyle, int _iPenWidth, COLORREF _PenColor, int _iStartX, int _iStartY);
 	CRectangle();
 	virtual ~CRectangle();
 
@@ -19,12 +19,10 @@ public:
 	void SetFillColor(COLORREF _newColor);
 	void SetPenStyle (int _iPenStyle);
 	void SetPenColor(COLORREF _newColor);
-	void SetHatchStyle(int _iHatchStyle);
 	
 
 private:
 	EBRUSHSTYLE m_eBrushStyle;
-	int m_iHatchStyle;
 	int m_iPenWidth;
 	COLORREF m_FillColor;
 	int m_iPenStyle;

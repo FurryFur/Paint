@@ -2,32 +2,39 @@
 #define __POLYGON_H__
 
 //	Library Includes
+#define NOMINMAX
+#include <vector>
 #include <windows.h>
 #include <windowsx.h>
 
 #include "shape.h"
+#include "Enum.h"
 
 class CPolygon : public IShape
 {
 public:
-	CPolygon::CPolygon(int _iHatchStyle, COLORREF _FillColor, int _iPenStyle, COLORREF _PenColor, int _iPenWidth);
+	CPolygon::CPolygon(EBRUSHSTYLE _eBrushStyle, COLORREF _FillColor, int _iPenStyle, int _iPenWidth, COLORREF _PenColor, int _iStartX, int _iStartY);
 	CPolygon();
 	virtual ~CPolygon();
 
 	virtual void Draw(HDC _hdc);
+	void SetBrushStyle(EBRUSHSTYLE _eBrushStyle);
 	void SetFillColor(COLORREF _newColor);
+	void SetPenStyle(int _iPenStyle);
 	void SetPenColor(COLORREF _newColor);
+
 	void AddPoint(POINT p);
 
 
 private:
-	COLORREF m_FillColor;
-	COLORREF m_iPenColor;
-	POINT* m_pPointList;
+	std::vector<POINT> m_vecPointList;
 	int m_nPoints;
-	int m_iFillStyle;
-	int m_iPenStyle;
+
+	EBRUSHSTYLE m_eBrushStyle;
 	int m_iPenWidth;
+	COLORREF m_FillColor;
+	int m_iPenStyle;
+	COLORREF m_PenColor;
 };
 
 #endif

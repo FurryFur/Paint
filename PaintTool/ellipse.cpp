@@ -1,14 +1,15 @@
 #include "ellipse.h"
 
-CEllipse::CEllipse(EBRUSHSTYLE _eBrushStyle, int _iHatchStyle, COLORREF _FillColor, int _iPenStyle, int _iPenWidth, COLORREF _PenColor, int _iStartX, int _iStartY) :
+CEllipse::CEllipse(EBRUSHSTYLE _eBrushStyle, COLORREF _FillColor, int _iPenStyle, int _iPenWidth, COLORREF _PenColor, int _iStartX, int _iStartY) :
 	m_eBrushStyle(_eBrushStyle),
-	m_iHatchStyle(_iHatchStyle),
 	m_PenColor(_PenColor),
 	m_FillColor(_FillColor),
 	m_iPenStyle(_iPenStyle),
 	m_iPenWidth(_iPenWidth),
 	IShape(_iStartX, _iStartY)
 {
+	SetEndX(_iStartX);
+	SetEndY(_iStartY);
 }
 
 CEllipse::CEllipse()
@@ -69,9 +70,3 @@ void CEllipse::SetPenColor(COLORREF _newColor)
 {
 	m_PenColor = _newColor;
 }
-
-void CEllipse::SetHatchStyle(int _iHatchStyle)
-{
-	m_iHatchStyle = _iHatchStyle;
-}
-

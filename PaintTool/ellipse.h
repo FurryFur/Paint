@@ -11,7 +11,7 @@
 class CEllipse : public IShape
 {
 public:
-	CEllipse(EBRUSHSTYLE _eBrushStyle, int _iHatchStyle, COLORREF _FillColor, int _iPenStyle, int _iPenWidth, COLORREF _PenColor, int _iStartX, int _iStartY);
+	CEllipse(EBRUSHSTYLE _eBrushStyle, COLORREF _FillColor, int _iPenStyle, int _iPenWidth, COLORREF _PenColor, int _iStartX, int _iStartY);
 	CEllipse();
 	virtual ~CEllipse();
 
@@ -20,11 +20,9 @@ public:
 	void SetFillColor(COLORREF _newColor);
 	void SetPenStyle(int _iPenStyle);
 	void SetPenColor(COLORREF _newColor);
-	void SetHatchStyle(int _iHatchStyle);
 
 private:
 	EBRUSHSTYLE m_eBrushStyle;
-	int m_iHatchStyle;
 	int m_iPenWidth;
 	COLORREF m_FillColor;
 	int m_iPenStyle;

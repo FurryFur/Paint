@@ -14,9 +14,9 @@ public:
 	virtual void Draw(HDC _hdc) = 0;
 
 	virtual void SetStartX(int _iStartX);
-	void SetEndX(int _iEndX);
+	virtual void SetEndX(int _iEndX);
 	virtual void SetStartY(int _iStartX);
-	void SetEndY(int _iStartX);
+	virtual void SetEndY(int _iStartX);
 	int GetStartX() const;
 	int GetStartY() const;
 	int GetEndX() const;
@@ -25,7 +25,7 @@ public:
 	//void SetColor(COLORREF _newColor);
 
 protected:
-	IShape() {};
+	IShape();
 	IShape(int _iStartX, int _iStartY);
 	virtual ~IShape() {}
 

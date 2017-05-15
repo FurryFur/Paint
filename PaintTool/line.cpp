@@ -6,6 +6,8 @@ CLine::CLine(int _iStyle, int _iWidth, COLORREF _newColor, int _iStartX, int _iS
 	m_Color(_newColor),
 	IShape(_iStartX, _iStartY)
 {
+	SetEndX(_iStartX);
+	SetEndY(_iStartY);
 }
 
 CLine::CLine()

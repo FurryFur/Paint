@@ -166,9 +166,9 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 		s_iCurMouseX = static_cast<int>(LOWORD(_lparam));
 		s_iCurMouseY = static_cast<int>(HIWORD(_lparam));
 
-		if (s_pCurShape != nullptr)
+		if (s_pCurShape != nullptr && s_eCurShapeTool != POLYGONSHAPE)
 		{
-			if (typeid(*s_pCurShape) == typeid(CStamp))
+			if (s_eCurShapeTool == STAMP)
 			{
 				s_pCurShape->SetStartX(s_iCurMouseX);
 				s_pCurShape->SetStartY(s_iCurMouseY);
@@ -188,34 +188,41 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 	}
 	case WM_LBUTTONDOWN:
 	{
-		// Create new shape
-		switch (s_eCurShapeTool)
+		// Add points to polygon instead if we are still making a polygon
+		CPolygon* pPolygon = dynamic_cast<CPolygon*>(s_pCurShape);
+		if (s_eCurShapeTool == POLYGONSHAPE && pPolygon)
 		{
-		case FREEHAND:
-			break;
-		case LINESHAPE:
-			// TODO: Pen width should be set to 1 for all non-solid 
-			s_pCurShape = new CLine(s_iCurPenStyle, s_iCurPenWidth, s_colCurPen, s_iCurMouseX, s_iCurMouseY);
-			break;
-		case RECTANGLESHAPE:
-			s_pCurShape = new CRectangle(s_eCurBrushStyle, 0, s_colCurBrush, s_iCurPenStyle, s_iCurPenWidth, s_colCurPen, s_iCurMouseX, s_iCurMouseY);
-			break;
-		case ELLIPSESHAPE:
-			s_pCurShape = new CEllipse(s_eCurBrushStyle, 0, s_colCurBrush, s_iCurPenStyle, s_iCurPenWidth, s_colCurPen, s_iCurMouseX, s_iCurMouseY);
-			break;
-		case POLYGONSHAPE:
-			break;
-		case STAMP:
-			s_pCurShape = new CStamp(g_hInstance, L"dummy", s_iCurMouseX, s_iCurMouseY);
-			break;
-		default:
-			break;
+			pPolygon->AddPoint({ s_iCurMouseX, s_iCurMouseY });
 		}
-		s_pCurShape->SetEndX(s_iCurMouseX);
-		s_pCurShape->SetEndY(s_iCurMouseY);
+		else
+		{
+			// Create new shape
+			switch (s_eCurShapeTool)
+			{
+			case FREEHAND:
+				break;
+			case LINESHAPE:
+				s_pCurShape = new CLine(s_iCurPenStyle, s_iCurPenWidth, s_colCurPen, s_iCurMouseX, s_iCurMouseY);
+				break;
+			case RECTANGLESHAPE:
+				s_pCurShape = new CRectangle(s_eCurBrushStyle, s_colCurBrush, s_iCurPenStyle, s_iCurPenWidth, s_colCurPen, s_iCurMouseX, s_iCurMouseY);
+				break;
+			case ELLIPSESHAPE:
+				s_pCurShape = new CEllipse(s_eCurBrushStyle, s_colCurBrush, s_iCurPenStyle, s_iCurPenWidth, s_colCurPen, s_iCurMouseX, s_iCurMouseY);
+				break;
+			case POLYGONSHAPE:
+				s_pCurShape = new CPolygon(s_eCurBrushStyle, s_colCurBrush, s_iCurPenStyle, s_iCurPenWidth, s_colCurPen, s_iCurMouseX, s_iCurMouseY);
+				break;
+			case STAMP:
+				s_pCurShape = new CStamp(g_hInstance, L"dummy", s_iCurMouseX, s_iCurMouseY);
+				break;
+			default:
+				break;
+			}
 
-		// Add new shape to canvas
-		s_pCanvas->AddShape(s_pCurShape);
+			// Add new shape to canvas
+			s_pCanvas->AddShape(s_pCurShape);
+		}
 
 		// Trigger redraw
 		InvalidateRect(_hwnd, NULL, FALSE);
@@ -225,7 +232,10 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 	}
 	case WM_LBUTTONUP:
 	{
-		s_pCurShape = nullptr;
+		if (s_eCurShapeTool != POLYGONSHAPE)
+		{
+			s_pCurShape = nullptr;
+		}
 
 		return 0;
 		break;

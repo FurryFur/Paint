@@ -1,26 +1,29 @@
-#include "rectangle.h"
+#include <algorithm>
 
-CRectangle::CRectangle(EBRUSHSTYLE _eBrushStyle, COLORREF _FillColor, int _iPenStyle, int _iPenWidth, COLORREF _PenColor, int _iStartX, int _iStartY) :
+#include "polygon.h"
+
+CPolygon::CPolygon(EBRUSHSTYLE _eBrushStyle, COLORREF _FillColor, int _iPenStyle, int _iPenWidth, COLORREF _PenColor, int _iStartX, int _iStartY) :
 	m_eBrushStyle(_eBrushStyle),
 	m_PenColor(_PenColor),
 	m_FillColor(_FillColor),
 	m_iPenStyle(_iPenStyle),
 	m_iPenWidth(_iPenWidth),
+	m_vecPointList{{_iStartX, _iStartY}},
 	IShape(_iStartX, _iStartY)
 {
 	SetEndX(_iStartX);
 	SetEndY(_iStartY);
 }
 
-CRectangle::CRectangle()
+CPolygon::CPolygon()
 {
 }
 
-CRectangle::~CRectangle()
+CPolygon::~CPolygon()
 {
 }
 
-void CRectangle::Draw(HDC _hdc)
+void CPolygon::Draw(HDC _hdc)
 {
 	HPEN hPen = CreatePen(m_iPenStyle, m_iPenWidth, m_PenColor);
 	HPEN hOldPen = static_cast<HPEN>(SelectObject(_hdc, hPen));
@@ -40,8 +43,8 @@ void CRectangle::Draw(HDC _hdc)
 		break;
 	}
 	HBRUSH hOldBrush = static_cast<HBRUSH>(SelectObject(_hdc, hBrush));
-	
-	Rectangle(_hdc, m_iStartX, m_iStartY, m_iEndX, m_iEndY);
+
+	Polygon(_hdc, m_vecPointList.data(), m_vecPointList.size());
 	//RECT rectToFill{ m_iStartX, m_iStartY, m_iEndX, m_iEndY };
 	//FillRect(_hdc,l &rectToFill, hBrush);
 
@@ -51,22 +54,36 @@ void CRectangle::Draw(HDC _hdc)
 	DeleteObject(hPen);
 }
 
-void CRectangle::SetBrushStyle(EBRUSHSTYLE _eBrushStyle)
+void CPolygon::AddPoint(POINT p)
 {
-	m_eBrushStyle =_eBrushStyle;
+	m_vecPointList.push_back(p);
+
+	// Update bounding rect to notify canvas with
+	m_iStartX = std::min(p.x, static_cast<long>(m_iStartX));
+	m_iStartY = std::min(p.y, static_cast<long>(m_iStartY));
+	m_iEndX = std::max(p.x, static_cast<long>(m_iEndX));
+	m_iEndY = std::max(p.y, static_cast<long>(m_iEndY));
+
+	// Notify canvas of update to shape
+	NotifyUpdated();
 }
 
-void CRectangle::SetFillColor(COLORREF _newColor)
+void CPolygon::SetBrushStyle(EBRUSHSTYLE _eBrushStyle)
+{
+	m_eBrushStyle = _eBrushStyle;
+}
+
+void CPolygon::SetFillColor(COLORREF _newColor)
 {
 	m_FillColor = _newColor;
 }
 
-void CRectangle::SetPenStyle(int _iPenStyle)
+void CPolygon::SetPenStyle(int _iPenStyle)
 {
 	m_iPenStyle = _iPenStyle;
 }
 
-void CRectangle::SetPenColor(COLORREF _newColor)
+void CPolygon::SetPenColor(COLORREF _newColor)
 {
 	m_PenColor = _newColor;
 }
