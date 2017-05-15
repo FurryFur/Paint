@@ -31,7 +31,7 @@ public:
 	CBackBuffer* GetBackBuffer();
 	bool Draw(HWND _hwnd);
 	// Save Canvas to bitmap
-	void Save();
+	void Save(HWND _hwnd);
 	void AddShape(IShape*);
 	int GetWidth() const;
 	int GetHeight() const;

@@ -102,7 +102,7 @@ bool CCanvas::Resize(HWND _hwnd, int _iWidth, int _iHeight)
 	return m_pBackBuffer->Initialise(_hwnd, _iWidth, _iHeight);
 }
 
-void CCanvas::Save()
+void CCanvas::Save(HWND _hwnd)
 {
 	// Get bitmap info
 	BITMAP bitmapCapture;
@@ -130,13 +130,40 @@ void CCanvas::Save()
 	LPVOID lpBits = malloc(bmih.biSizeImage);
 	GetDIBits(m_pBackBuffer->GetBFDC(), m_pBackBuffer->GetHBitmap(), 0, bmih.biHeight, lpBits, &bmi, DIB_RGB_COLORS);
 
-	// Write to file
-	FILE* pFile = fopen("test.bmp", "wb");
-	fwrite(&bmfh, 1, sizeof(BITMAPFILEHEADER), pFile);
-	fwrite(&bmih, 1, sizeof(BITMAPINFOHEADER), pFile);
-	fwrite(lpBits, 1, bmih.biSizeImage, pFile);
+	// Get File to save to 
+	char arrcFilename[ MAX_PATH ];
+	OPENFILENAMEA ofn;
+	ZeroMemory(&arrcFilename, sizeof(arrcFilename));
+	ZeroMemory(&ofn, sizeof(ofn));
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = NULL;  // If you have a window to center over, put its HANDLE here
+	ofn.lpstrFilter = "Bitmap Files\0*.bmp\0Any File\0*.*\0";
+	ofn.lpstrDefExt = "bmp";
+	ofn.lpstrFile = arrcFilename;
+	ofn.nMaxFile = MAX_PATH;
+	ofn.lpstrTitle = "Save As";
+
+	// Open file for writing if the user didn't cancel
+	if (GetSaveFileNameA(&ofn))
+	{
+		// Check file opened properly
+		FILE* pFile = fopen(arrcFilename, "wb");
+		if (!pFile)
+		{
+			MessageBoxA(_hwnd, "Error opening file", "Error", MB_ICONERROR);
+		}
+		else
+		{
+			// Write to file
+			fwrite(&bmfh, 1, sizeof(BITMAPFILEHEADER), pFile);
+			fwrite(&bmih, 1, sizeof(BITMAPINFOHEADER), pFile);
+			fwrite(lpBits, 1, bmih.biSizeImage, pFile);
+
+			// Cleanup
+			fclose(pFile);
+		}
+	}
 
 	//Cleanup
-	fclose(pFile);
 	free(lpBits);
 }

@@ -246,7 +246,7 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 		{
 		case ID_FILE_SAVE:
 		{
-			s_pCanvas->Save();
+			s_pCanvas->Save(_hwnd);
 
 			break;
 		}
