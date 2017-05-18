@@ -30,21 +30,27 @@ public:
 	bool Initialise(HWND _hwnd, int _iWidth, int _iHeight);
 	CBackBuffer* GetBackBuffer();
 	bool Draw(HWND _hwnd);
+	bool DrawBackground();
 	// Save Canvas to bitmap
 	void Save(HWND _hwnd);
 	void AddShape(IShape*);
+	void PopShape();
 	int GetWidth() const;
 	int GetHeight() const;
+	void SetBackground(HBITMAP _hBitmapBackground);
+
+	static CCanvas* Open(HINSTANCE _hInstance, HWND _hwnd);
 
 	// Notify the canvas that the specified shape has been updated (moved)
 	virtual void NotifyUpdated(const IShape* _pkShape) override;
 	
 private:
 	CBackBuffer* m_pBackBuffer; // A canvas has a backbuffer.
-	std::vector<IShape*> m_vecShapes;
+	std::vector<IShape*> m_vecpShapes;
 	bool m_bNeedsResize;
 	const IShape* m_pkShapeThatTriggeredResize;
 	bool Resize(HWND _hwnd, int _iWidth, int _iHeight);
+	HBITMAP m_hbBackground;
 };
 
 #endif

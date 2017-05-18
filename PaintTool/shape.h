@@ -11,6 +11,8 @@ class IUpdateListener;
 class IShape
 {
 public:
+	virtual ~IShape() {}
+
 	virtual void Draw(HDC _hdc) = 0;
 
 	virtual void SetStartX(int _iStartX);
@@ -27,7 +29,6 @@ public:
 protected:
 	IShape();
 	IShape(int _iStartX, int _iStartY);
-	virtual ~IShape() {}
 
 	void NotifyUpdated();
 

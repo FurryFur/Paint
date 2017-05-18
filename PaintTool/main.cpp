@@ -3,6 +3,7 @@
 #include <windows.h>   // Include all the windows headers.
 #include <windowsx.h>  // Include useful macros.
 #include <typeinfo>
+#include <string>
 
 #include "resource.h"
 #include "shape.h"
@@ -44,7 +45,8 @@ void CheckShapeMenuItem(HMENU _hMenu, UINT _uIDCheckItem)
 	CheckMenuItem(_hMenu, ID_SHAPE_R, MF_UNCHECKED);
 	CheckMenuItem(_hMenu, ID_SHAPE_ELLIPSE, MF_UNCHECKED);
 	CheckMenuItem(_hMenu, ID_SHAPE_POLYGON, MF_UNCHECKED);
-	CheckMenuItem(_hMenu, ID_ADD_STAMP, MF_UNCHECKED);
+	CheckMenuItem(_hMenu, ID_STAMP_DEFAULT, MF_UNCHECKED);
+	CheckMenuItem(_hMenu, ID_STAMP_FROMFILE, MF_UNCHECKED);
 
 	// Check selected menu item
 	CheckMenuItem(_hMenu, _uIDCheckItem, MF_CHECKED);
@@ -136,6 +138,7 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 	static int s_iCurMouseY;
 	static COLORREF s_colCurPen = RGB(40, 128, 255);
 	static COLORREF s_colCurBrush = RGB(0, 255, 0);
+	static std::string s_strStampFilename;
 
 	HMENU hMenu = GetMenu(_hwnd);
 	
@@ -186,6 +189,14 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 		return 0;
 		break;
 	}
+	case WM_RBUTTONDOWN:
+	{
+		// Stop drawing current polygon on right mouse click
+		if (s_eCurShapeTool == POLYGONSHAPE)
+		{
+			s_pCurShape = nullptr;
+		}
+	}
 	case WM_LBUTTONDOWN:
 	{
 		// Add points to polygon instead if we are still making a polygon
@@ -214,7 +225,7 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 				s_pCurShape = new CPolygon(s_eCurBrushStyle, s_colCurBrush, s_iCurPenStyle, s_iCurPenWidth, s_colCurPen, s_iCurMouseX, s_iCurMouseY);
 				break;
 			case STAMP:
-				s_pCurShape = new CStamp(g_hInstance, L"dummy", s_iCurMouseX, s_iCurMouseY);
+				s_pCurShape = new CStamp(g_hInstance, _hwnd, s_strStampFilename, s_iCurMouseX, s_iCurMouseY);
 				break;
 			default:
 				break;
@@ -229,6 +240,22 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 
 		return 0;
 		break;
+	}
+	case WM_KEYDOWN:
+	{
+	case 0x5A: // Z Key
+	{
+		if (s_pCurShape)
+		{
+			s_pCurShape = nullptr;
+		}
+
+		s_pCanvas->PopShape();
+
+		InvalidateRect(_hwnd, NULL, FALSE);
+
+		break;
+	}
 	}
 	case WM_LBUTTONUP:
 	{
@@ -247,6 +274,19 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 		case ID_FILE_SAVE:
 		{
 			s_pCanvas->Save(_hwnd);
+
+			break;
+		}
+		case ID_FILE_OPEN:
+		{
+			CCanvas* pNewCanvas = CCanvas::Open(g_hInstance, _hwnd);
+			if (pNewCanvas)
+			{
+				delete s_pCanvas;
+				s_pCanvas = pNewCanvas;
+
+				InvalidateRect(_hwnd, NULL, FALSE);
+			}
 
 			break;
 		}
@@ -287,11 +327,38 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 
 			break;
 		}
-		case ID_ADD_STAMP:
+		case ID_STAMP_FROMFILE:
 		{
 			s_eCurShapeTool = STAMP;
 
-			CheckShapeMenuItem(hMenu, ID_ADD_STAMP);
+			char arrcFilename[MAX_PATH];
+			OPENFILENAMEA ofn;
+			ZeroMemory(&arrcFilename, sizeof(arrcFilename));
+			ZeroMemory(&ofn, sizeof(ofn));
+			ofn.lStructSize = sizeof(ofn);
+			ofn.hwndOwner = _hwnd;  // If you have a window to center over, put its HANDLE here
+			ofn.lpstrFilter = "Bitmap Files\0*.bmp\0Any File\0*.*\0";
+			ofn.lpstrDefExt = "bmp";
+			ofn.lpstrFile = arrcFilename;
+			ofn.nMaxFile = MAX_PATH;
+			ofn.lpstrTitle = "Open";
+			ofn.Flags = OFN_FILEMUSTEXIST;
+
+			if (GetOpenFileNameA(&ofn))
+			{
+				s_strStampFilename = arrcFilename;
+			}
+
+			CheckShapeMenuItem(hMenu, ID_STAMP_FROMFILE);
+
+			break;
+		}
+		case ID_STAMP_DEFAULT:
+		{
+			s_eCurShapeTool = STAMP;
+			s_strStampFilename = "";
+
+			CheckShapeMenuItem(hMenu, ID_STAMP_DEFAULT);
 
 			break;
 		}

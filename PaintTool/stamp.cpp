@@ -1,14 +1,34 @@
 #include "stamp.h"
 #include "resource.h"
 
-CStamp::CStamp()
+CStamp::CStamp() :
+	m_hBitMap(0)
 {
 }
 
-CStamp::CStamp(HINSTANCE _hInstance, wchar_t * filename, int _iStartX, int _iStartY) :
+CStamp::CStamp(HINSTANCE _hInstance, HWND _hwnd, const std::string& _rkstrFilename, int _iStartX, int _iStartY) :
+	m_hBitMap(0),
 	IShape(_iStartX, _iStartY)
 {
-	m_hBitMap = LoadBitmap(_hInstance, MAKEINTRESOURCE(IDB_STAMP));
+	// Load bitmap from file if one is specified
+	if (!_rkstrFilename.empty())
+	{
+		HBITMAP hBitmap = static_cast<HBITMAP>(LoadImageA(_hInstance, _rkstrFilename.c_str(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE));
+		if (!hBitmap)
+		{
+			MessageBoxA(_hwnd, "Error opening file", "Error", MB_ICONERROR);
+		}
+		else
+		{
+			m_hBitMap = hBitmap;
+		}
+	}
+
+	// Load the default bitmap if one hasn't been loaded already
+	if (!m_hBitMap)
+	{
+		m_hBitMap = LoadBitmap(_hInstance, MAKEINTRESOURCE(IDB_STAMP));
+	}
 
 	BITMAP bitmap;
 	GetObject(m_hBitMap, sizeof(BITMAP), &bitmap);

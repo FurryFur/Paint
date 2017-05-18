@@ -13,6 +13,10 @@ CCanvas::CCanvas() :
 
 CCanvas::~CCanvas()
 {
+	while (m_vecpShapes.size() > 0)
+	{
+		PopShape();
+	}
 }
 
 bool CCanvas::Initialise(HWND _hwnd, int _iWidth, int _iHeight)
@@ -47,8 +51,11 @@ bool CCanvas::Draw(HWND _hwnd)
 	// Clear the back buffer
 	m_pBackBuffer->Clear();
 
+	// Draw canvas background
+	DrawBackground();
+
 	// Draw all shapes to back buffer
-	for (auto it = m_vecShapes.begin(); it != m_vecShapes.end(); ++it)
+	for (auto it = m_vecpShapes.begin(); it != m_vecpShapes.end(); ++it)
 	{
 		(*it)->Draw(m_pBackBuffer->GetBFDC());
 	}
@@ -59,11 +66,46 @@ bool CCanvas::Draw(HWND _hwnd)
 	return true;
 }
 
+bool CCanvas::DrawBackground()
+{
+	if (m_hbBackground)
+	{
+		BITMAP bitmapInfo;
+		GetObject(m_hbBackground, sizeof(BITMAP), &bitmapInfo);
+
+		// Create device context to load bitmap into
+		HDC hdcBitmap = CreateCompatibleDC(GetBackBuffer()->GetBFDC());
+
+		// Select bitmap into device context
+		HBITMAP hOldBitmap = static_cast<HBITMAP>(SelectObject(hdcBitmap, m_hbBackground));
+
+		// Bit blip bitmap device context to main device context
+		BitBlt(GetBackBuffer()->GetBFDC(), 0, 0, bitmapInfo.bmWidth, bitmapInfo.bmHeight, hdcBitmap, 0, 0, SRCCOPY);
+
+		// Cleanup
+		static_cast<HBITMAP>(SelectObject(hdcBitmap, hOldBitmap));
+		DeleteDC(hdcBitmap);
+
+		return true;
+	}
+
+	return false;
+}
+
 void CCanvas::AddShape(IShape * _pShape)
 {
-	m_vecShapes.push_back(_pShape);
+	m_vecpShapes.push_back(_pShape);
 
 	_pShape->SetUpdateListener(this);
+}
+
+void CCanvas::PopShape()
+{
+	if (m_vecpShapes.size() > 0)
+	{
+		delete m_vecpShapes.back();
+		m_vecpShapes.pop_back();
+	}
 }
 
 int CCanvas::GetWidth() const
@@ -102,23 +144,65 @@ bool CCanvas::Resize(HWND _hwnd, int _iWidth, int _iHeight)
 	return m_pBackBuffer->Initialise(_hwnd, _iWidth, _iHeight);
 }
 
+void CCanvas::SetBackground(HBITMAP _hbBackground)
+{
+	m_hbBackground = _hbBackground;
+}
+
+CCanvas* CCanvas::Open(HINSTANCE _hInstance, HWND _hwnd)
+{
+	CCanvas* pCanvas = nullptr;
+
+	char arrcFilename[MAX_PATH];
+	OPENFILENAMEA ofn;
+	ZeroMemory(&arrcFilename, sizeof(arrcFilename));
+	ZeroMemory(&ofn, sizeof(ofn));
+	ofn.lStructSize = sizeof(ofn);
+	ofn.hwndOwner = _hwnd;  // If you have a window to center over, put its HANDLE here
+	ofn.lpstrFilter = "Bitmap Files\0*.bmp\0Any File\0*.*\0";
+	ofn.lpstrDefExt = "bmp";
+	ofn.lpstrFile = arrcFilename;
+	ofn.nMaxFile = MAX_PATH;
+	ofn.lpstrTitle = "Open";
+	ofn.Flags = OFN_FILEMUSTEXIST;
+
+	if (GetOpenFileNameA(&ofn))
+	{
+		HBITMAP hBitMap = static_cast<HBITMAP>(LoadImageA(_hInstance, arrcFilename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE));
+		if (!hBitMap)
+		{
+			MessageBoxA(_hwnd, "Error opening file", "Error", MB_ICONERROR);
+		}
+		else
+		{
+			pCanvas = new CCanvas();
+			BITMAP bitmapInfo;
+			GetObject(hBitMap, sizeof(BITMAP), &bitmapInfo);
+			pCanvas->Initialise(_hwnd, bitmapInfo.bmWidth, bitmapInfo.bmHeight);
+			pCanvas->SetBackground(hBitMap);
+		}
+	}
+
+	return pCanvas;
+}
+
 void CCanvas::Save(HWND _hwnd)
 {
 	// Get bitmap info
-	BITMAP bitmapCapture;
-	GetObject(m_pBackBuffer->GetHBitmap(), sizeof(BITMAP), &bitmapCapture);
+	BITMAP bitmapInfo;
+	GetObject(m_pBackBuffer->GetHBitmap(), sizeof(BITMAP), &bitmapInfo);
 
 	// Create bitmap info header
 	BITMAPINFO bmi;
 	BITMAPINFOHEADER& bmih = bmi.bmiHeader;
 	bmih.biSize = sizeof(BITMAPINFOHEADER);
-	bmih.biWidth = bitmapCapture.bmWidth;
-	bmih.biHeight = bitmapCapture.bmHeight;
-	bmih.biPlanes = bitmapCapture.bmPlanes;
-	bmih.biBitCount = bitmapCapture.bmBitsPixel;
+	bmih.biWidth = bitmapInfo.bmWidth;
+	bmih.biHeight = bitmapInfo.bmHeight;
+	bmih.biPlanes = bitmapInfo.bmPlanes;
+	bmih.biBitCount = bitmapInfo.bmBitsPixel;
 	// Our bitmap is uncrompressed
 	bmih.biCompression = BI_RGB;
-	bmih.biSizeImage = bitmapCapture.bmWidth * bitmapCapture.bmHeight * 4;
+	bmih.biSizeImage = bitmapInfo.bmWidth * bitmapInfo.bmHeight * 4;
 
 	// Create bitmap file header
 	BITMAPFILEHEADER bmfh;
@@ -136,7 +220,7 @@ void CCanvas::Save(HWND _hwnd)
 	ZeroMemory(&arrcFilename, sizeof(arrcFilename));
 	ZeroMemory(&ofn, sizeof(ofn));
 	ofn.lStructSize = sizeof(ofn);
-	ofn.hwndOwner = NULL;  // If you have a window to center over, put its HANDLE here
+	ofn.hwndOwner = _hwnd;  // If you have a window to center over, put its HANDLE here
 	ofn.lpstrFilter = "Bitmap Files\0*.bmp\0Any File\0*.*\0";
 	ofn.lpstrDefExt = "bmp";
 	ofn.lpstrFile = arrcFilename;
