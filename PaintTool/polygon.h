@@ -28,7 +28,6 @@ public:
 
 private:
 	std::vector<POINT> m_vecPointList;
-	int m_nPoints;
 
 	EBRUSHSTYLE m_eBrushStyle;
 	int m_iPenWidth;

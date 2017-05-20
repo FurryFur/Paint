@@ -2,6 +2,7 @@
 #define __SHAPE_H__
 
 //	Library Includes
+#define NOMINMAX
 #include <functional>
 #include <windows.h>
 #include <windowsx.h>

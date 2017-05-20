@@ -8,8 +8,6 @@ CEllipse::CEllipse(EBRUSHSTYLE _eBrushStyle, COLORREF _FillColor, int _iPenStyle
 	m_iPenWidth(_iPenWidth),
 	IShape(_iStartX, _iStartY)
 {
-	SetEndX(_iStartX);
-	SetEndY(_iStartY);
 }
 
 CEllipse::CEllipse()

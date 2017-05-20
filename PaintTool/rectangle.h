@@ -14,7 +14,7 @@ public:
 	CRectangle();
 	virtual ~CRectangle();
 
-	virtual void Draw(HDC _hdc);
+	virtual void Draw(HDC _hdc) override;
 	void SetBrushStyle(EBRUSHSTYLE _eBrushStyle);
 	void SetFillColor(COLORREF _newColor);
 	void SetPenStyle (int _iPenStyle);

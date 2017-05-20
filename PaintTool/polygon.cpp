@@ -11,8 +11,6 @@ CPolygon::CPolygon(EBRUSHSTYLE _eBrushStyle, COLORREF _FillColor, int _iPenStyle
 	m_vecPointList{{_iStartX, _iStartY}},
 	IShape(_iStartX, _iStartY)
 {
-	SetEndX(_iStartX);
-	SetEndY(_iStartY);
 }
 
 CPolygon::CPolygon()

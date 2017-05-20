@@ -148,6 +148,7 @@
     <ClInclude Include="Enum.h" />
     <ClInclude Include="IUpdateListener.h" />
     <ClInclude Include="line.h" />
+    <ClInclude Include="PaintBrush.h" />
     <ClInclude Include="polygon.h" />
     <ClInclude Include="rectangle.h" />
     <ClInclude Include="resource.h" />
@@ -161,6 +162,7 @@
     <ClCompile Include="IUpdateListener.cpp" />
     <ClCompile Include="line.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="PaintBrush.cpp" />
     <ClCompile Include="polygon.cpp" />
     <ClCompile Include="rectangle.cpp" />
     <ClCompile Include="shape.cpp" />

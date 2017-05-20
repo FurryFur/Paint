@@ -8,8 +8,6 @@ CRectangle::CRectangle(EBRUSHSTYLE _eBrushStyle, COLORREF _FillColor, int _iPenS
 	m_iPenWidth(_iPenWidth),
 	IShape(_iStartX, _iStartY)
 {
-	SetEndX(_iStartX);
-	SetEndY(_iStartY);
 }
 
 CRectangle::CRectangle()

@@ -14,6 +14,7 @@
 #include "polygon.h"
 #include "stamp.h"
 #include "backBuffer.h"
+#include "PaintBrush.h"
 
 #define WINDOW_CLASS_NAME L"WINCLASS1"
 
@@ -29,7 +30,8 @@ enum ESHAPE
 	RECTANGLESHAPE,
 	ELLIPSESHAPE,
 	POLYGONSHAPE,
-	STAMP
+	STAMP,
+	BRUSHSHAPE
 };
 
 
@@ -47,6 +49,7 @@ void CheckShapeMenuItem(HMENU _hMenu, UINT _uIDCheckItem)
 	CheckMenuItem(_hMenu, ID_SHAPE_POLYGON, MF_UNCHECKED);
 	CheckMenuItem(_hMenu, ID_STAMP_DEFAULT, MF_UNCHECKED);
 	CheckMenuItem(_hMenu, ID_STAMP_FROMFILE, MF_UNCHECKED);
+	CheckMenuItem(_hMenu, ID_SHAPE_PAINTBRUSH, MF_UNCHECKED);
 
 	// Check selected menu item
 	CheckMenuItem(_hMenu, _uIDCheckItem, MF_CHECKED);
@@ -171,7 +174,13 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 
 		if (s_pCurShape != nullptr && s_eCurShapeTool != POLYGONSHAPE)
 		{
-			if (s_eCurShapeTool == STAMP)
+			// Add points to brush stroke instead if we are still making a paint brush shape
+			CPaintBrush* pPaintBrush = dynamic_cast<CPaintBrush*>(s_pCurShape);
+			if (s_eCurShapeTool == BRUSHSHAPE && pPaintBrush)
+			{
+				pPaintBrush->AddPoint({ s_iCurMouseX, s_iCurMouseY });
+			}
+			else if (s_eCurShapeTool == STAMP)
 			{
 				s_pCurShape->SetStartX(s_iCurMouseX);
 				s_pCurShape->SetStartY(s_iCurMouseY);
@@ -192,7 +201,7 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 	case WM_RBUTTONDOWN:
 	{
 		// Stop drawing current polygon on right mouse click
-		if (s_eCurShapeTool == POLYGONSHAPE)
+		if (s_eCurShapeTool == POLYGONSHAPE || s_eCurShapeTool == BRUSHSHAPE)
 		{
 			s_pCurShape = nullptr;
 		}
@@ -223,6 +232,9 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 				break;
 			case POLYGONSHAPE:
 				s_pCurShape = new CPolygon(s_eCurBrushStyle, s_colCurBrush, s_iCurPenStyle, s_iCurPenWidth, s_colCurPen, s_iCurMouseX, s_iCurMouseY);
+				break;
+			case BRUSHSHAPE:
+				s_pCurShape = new CPaintBrush(s_iCurPenStyle, s_iCurPenWidth, s_colCurPen, s_iCurMouseX, s_iCurMouseY);
 				break;
 			case STAMP:
 				s_pCurShape = new CStamp(g_hInstance, _hwnd, s_strStampFilename, s_iCurMouseX, s_iCurMouseY);
@@ -298,33 +310,31 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 		case ID_SHAPE_LINE:
 		{
 			s_eCurShapeTool = LINESHAPE;
-
 			CheckShapeMenuItem(hMenu, ID_SHAPE_LINE);
-
 			break;
 		}
 		case ID_SHAPE_R:
 		{
 			s_eCurShapeTool = RECTANGLESHAPE;
-
 			CheckShapeMenuItem(hMenu, ID_SHAPE_R);
-
 			break;
 		}
 		case ID_SHAPE_ELLIPSE:
 		{
 			s_eCurShapeTool = ELLIPSESHAPE;
-
 			CheckShapeMenuItem(hMenu, ID_SHAPE_ELLIPSE);
-
 			break;
 		}
 		case ID_SHAPE_POLYGON:
 		{
 			s_eCurShapeTool = POLYGONSHAPE;
-
 			CheckShapeMenuItem(hMenu, ID_SHAPE_POLYGON);
-
+			break;
+		}
+		case ID_SHAPE_PAINTBRUSH:
+		{
+			s_eCurShapeTool = BRUSHSHAPE;
+			CheckShapeMenuItem(hMenu, ID_SHAPE_PAINTBRUSH);
 			break;
 		}
 		case ID_STAMP_FROMFILE:

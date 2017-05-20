@@ -48,6 +48,9 @@
     <ClInclude Include="IUpdateListener.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PaintBrush.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -78,6 +81,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="polygon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PaintBrush.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -9,6 +9,8 @@ IShape::IShape() :
 IShape::IShape(int _iStartX, int _iStartY) :
 	m_iStartX(_iStartX),
 	m_iStartY(_iStartY),
+	m_iEndX(_iStartX),
+	m_iEndY(_iStartY),
 	m_pUpdateListener(nullptr)
 {
 }
