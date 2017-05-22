@@ -231,8 +231,9 @@ void CCanvas::Save(HWND _hwnd)
 	if (GetSaveFileNameA(&ofn))
 	{
 		// Check file opened properly
-		FILE* pFile = fopen(arrcFilename, "wb");
-		if (!pFile)
+		FILE* pFile;
+		errno_t err = fopen_s(&pFile, arrcFilename, "wb");
+		if (err != 0)
 		{
 			MessageBoxA(_hwnd, "Error opening file", "Error", MB_ICONERROR);
 		}

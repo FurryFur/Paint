@@ -129,7 +129,6 @@ LRESULT CALLBACK WindowProc(HWND _hwnd,
 	LPARAM _lparam)
 {
 	// This is the main message handler of the system.
-	HDC hdc;        // Handle to a device context.
 	static ESHAPE s_eCurShapeTool = LINESHAPE;
 	static int s_iCurPenWidth = 5;
 	static int s_iSavedPenWidth = -1;
