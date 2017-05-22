@@ -42,7 +42,7 @@ void CPolygon::Draw(HDC _hdc)
 	}
 	HBRUSH hOldBrush = static_cast<HBRUSH>(SelectObject(_hdc, hBrush));
 
-	Polygon(_hdc, m_vecPointList.data(), m_vecPointList.size());
+	Polygon(_hdc, m_vecPointList.data(), static_cast<int>(m_vecPointList.size()));
 	//RECT rectToFill{ m_iStartX, m_iStartY, m_iEndX, m_iEndY };
 	//FillRect(_hdc,l &rectToFill, hBrush);
 
